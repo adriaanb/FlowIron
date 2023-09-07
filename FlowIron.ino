@@ -1,23 +1,30 @@
+/**** THIS IS A WORK IN PROGRESS AND NOT YET A FULLY FUNCTIONING CODE BASE ****/
 /*******************************************************************************
-  Title: Tiny Reflow Controller
-  Version: 2.00
-  Date: 03-03-2019
-  Company: Rocket Scream Electronics
-  Author: Lim Phang Moh
-  Website: www.rocketscream.com
+  Title: FlowIron Reflow Hotplate
+  Version: 0.0.1
+  Date: 07.09.2023
+  Author: Adriaan Bernstein
 
-  Brief
-  =====
-  This is an example firmware for our Arduino compatible Tiny Reflow Controller.
-  A big portion of the code is copied over from our Reflow Oven Controller
-  Shield. We added both lead-free and leaded reflow profile support in this
-  firmware which can be selected by pressing switch #2 (labelled as LF|PB on PCB)
-  during system idle. The unit will remember the last selected reflow profile.
-  You'll need to use the MAX31856 library for Arduino.
+  The code is derived from the Tiny Reflow Controller by Rocket Scream Electronics.
+  Original Repository: https://github.com/rocketscream/TinyReflowController/
+  Original Author: Lim Phang Moh
+********************************************************************************
+
+  Disclaimer:
+  ===========
+  This repository contains files pertaining to a personal project involving mains voltage, which is hazardous. 
+  Ensure you're aware of risks and take precautions. Use or reference this content at your own risk. 
+  I assume no liability for any consequences arising from its use.
+  
+  Overview
+  ========
+  This project converts a clothing iron into a reflow soldering hotplate. 
+  
+  Reflow Curves
+  =============
 
   Lead-Free Reflow Curve
-  ======================
-
+  ----------------------
   Temperature (Degree Celcius)                 Magic Happens Here!
   245-|                                               x  x
       |                                            x        x
@@ -29,11 +36,8 @@
       |                    x              |                          |
   150-|               x                   |                          |
       |             x |                   |                          |
-      |           x   |                   |                          |
       |         x     |                   |                          |
-      |       x       |                   |                          |
       |     x         |                   |                          |
-      |   x           |                   |                          |
   30 -| x             |                   |                          |
       |<  60 - 90 s  >|<    90 - 120 s   >|<       90 - 120 s       >|
       | Preheat Stage |   Soaking Stage   |       Reflow Stage       | Cool
@@ -41,8 +45,7 @@
                                                                  Time (Seconds)
 
   Leaded Reflow Curve (Kester EP256)
-  ==================================
-
+  ----------------------------------
   Temperature (Degree Celcius)         Magic Happens Here!
   219-|                                       x  x
       |                                    x        x
@@ -52,89 +55,50 @@
       |                    x         |                    |       x
   150-|               x              |                    |           x
       |             x |              |                    |
-      |           x   |              |                    |
       |         x     |              |                    |
-      |       x       |              |                    |
       |     x         |              |                    |
-      |   x           |              |                    |
   30 -| x             |              |                    |
       |<  60 - 90 s  >|<  60 - 90 s >|<   60 - 90 s      >|
       | Preheat Stage | Soaking Stage|   Reflow Stage     | Cool
    0  |_ _ _ _ _ _ _ _|_ _ _ _ _ _ _ |_ _ _ _ _ _ _ _ _ _ |_ _ _ _ _ _ _ _ _ _ _
                                                                  Time (Seconds)
+  
+  License
+  =======
+  The parts of this code that are based on the original from Rocket Scream Electronics are
+  covered by the Creative Commons Share Alike v4.0 license
+  (http://creativecommons.org/licenses/by-sa/4.0/). 
+  Please refer to the original repository for full license details. 
 
-  This firmware owed very much on the works of other talented individuals as
-  follows:
-  ==========================================
-  Brett Beauregard (www.brettbeauregard.com)
-  ==========================================
-  Author of Arduino PID library. On top of providing industry standard PID
-  implementation, he gave a lot of help in making this reflow oven controller
-  possible using his awesome library.
-
-  ==========================================
-  Limor Fried of Adafruit (www.adafruit.com)
-  ==========================================
-  Author of Arduino MAX31856 and SSD1306 libraries. Adafruit has been the source 
-  of tonnes of tutorials, examples, and libraries for everyone to learn.
-
-  ==========================================
-  Spence Konde (www.drazzy.com/e/)
-  ==========================================
-  Maintainer of the ATtiny core for Arduino:
-  https://github.com/SpenceKonde/ATTinyCore
-
-  Disclaimer
-  ==========
-  Dealing with high voltage is a very dangerous act! Please make sure you know
-  what you are dealing with and have proper knowledge before hand. Your use of
-  any information or materials on this Tiny Reflow Controller is entirely at
-  your own risk, for which we shall not be liable.
-
-  Licences
-  ========
-  This Tiny Reflow Controller hardware and firmware are released under the
-  Creative Commons Share Alike v3.0 license
-  http://creativecommons.org/licenses/by-sa/3.0/
-  You are free to take this piece of code, use it and modify it.
-  All we ask is attribution including the supporting libraries used in this
-  firmware.
+  Modifications from Original
+  ===========================
+  - Adapted for Arduino IoT Nano 33
+  - Use Thermistor instead of Thermocouple
+  - Uses SH1106 128x64 OLED display in place of SSD1306 
+  - Transitioned to an encoder-based input & control scheme
+  - Add manual temperature profile
 
   Required Libraries
   ==================
-  - Arduino PID Library:
-    >> https://github.com/br3ttb/Arduino-PID-Library
-  - Adafruit MAX31856 Library:
-    >> https://github.com/adafruit/Adafruit_MAX31856
-  - Adafruit SSD1306 Library:
-    >> https://github.com/adafruit/Adafruit_SSD1306
-  - Adafruit GFX Library:
-    >> https://github.com/adafruit/Adafruit-GFX-Library
-
-  Revision  Description
-  ========  ===========
-  2.00      Support V2 of the Tiny Reflow Controller:
-            - Based on ATMega328P 3.3V @ 8MHz
-            - Uses SSD1306 128x64 OLED
-  1.00      Initial public release:
-            - Based on ATtiny1634R 3.3V @ 8MHz
-            - Uses 8x2 alphanumeric LCD
+  - Arduino PID Library (bc fork; https://github.com/drf5n/Arduino-PID-Library)
+  - Adafruit NeoPixel (https://github.com/adafruit/Adafruit_NeoPixel)
+  - Adafruit GFX Library (https://github.com/adafruit/Adafruit-GFX-Library)
+  - Adafruit SH110X Library (https://github.com/adafruit/Adafruit_SH110x)
+  - EncoderStepCounter Library (https://github.com/M-Reimer/EncoderStepCounter)
 
 *******************************************************************************/
 
 // ***** INCLUDES *****
 #include <SPI.h>
 #include <Wire.h>
-#include <EEPROM.h>
-#include <LiquidCrystal.h>
-#include <Adafruit_GFX.h>      // Comment for VERSION 1
-#include <Adafruit_SSD1306.h>  // Comment for VERSION 1 
-#include <Adafruit_MAX31856.h> 
-#include <PID_v1.h>
+#include <Adafruit_NeoPixel.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SH110X.h>
+#include <PID_v1_bc.h>
+#include <EncoderStepCounter.h>
 
 // ***** TYPE DEFINITIONS *****
-typedef enum REFLOW_STATE
-{
+typedef enum REFLOW_STATE {
   REFLOW_STATE_IDLE,
   REFLOW_STATE_PREHEAT,
   REFLOW_STATE_SOAK,
@@ -145,35 +109,29 @@ typedef enum REFLOW_STATE
   REFLOW_STATE_ERROR
 } reflowState_t;
 
-typedef enum REFLOW_STATUS
-{
+typedef enum REFLOW_STATUS {
   REFLOW_STATUS_OFF,
   REFLOW_STATUS_ON
 } reflowStatus_t;
 
-typedef	enum SWITCH
-{
+typedef enum SWITCH {
   SWITCH_NONE,
-  SWITCH_1,
-  SWITCH_2
+  SWITCH_1
 } switch_t;
 
-typedef enum DEBOUNCE_STATE
-{
+typedef enum DEBOUNCE_STATE {
   DEBOUNCE_STATE_IDLE,
   DEBOUNCE_STATE_CHECK,
   DEBOUNCE_STATE_RELEASE
 } debounceState_t;
 
-typedef enum REFLOW_PROFILE
-{
+typedef enum REFLOW_PROFILE {
   REFLOW_PROFILE_LEADFREE,
-  REFLOW_PROFILE_LEADED
+  REFLOW_PROFILE_LEADED,
+  REFLOW_PROFILE_MANUAL
 } reflowProfile_t;
 
 // ***** CONSTANTS *****
-// ***** GENERAL *****
-#define VERSION 2 // Replace with 1 or 2
 
 // ***** GENERAL PROFILE CONSTANTS *****
 #define PROFILE_TYPE_ADDRESS 0
@@ -193,11 +151,19 @@ typedef enum REFLOW_PROFILE
 #define TEMPERATURE_REFLOW_MAX_PB 224
 #define SOAK_MICRO_PERIOD_PB 10000
 
+// ***** MANUAL TEMP SELECT CONSTANTS *****
+#define TEMPERATURE_SOAK_MAN_OFFSET 45
+#define TEMPERATURE_REFLOW_MAN_START 200
+#define SOAK_MICRO_PERIOD_MAN 9000
+
 // ***** SWITCH SPECIFIC CONSTANTS *****
 #define DEBOUNCE_PERIOD_MIN 100
 
 // ***** DISPLAY SPECIFIC CONSTANTS *****
 #define UPDATE_RATE 100
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define X_AXIS_START 18  // X-axis starting position
 
 // ***** PID PARAMETERS *****
 // ***** PRE-HEAT STAGE *****
@@ -214,12 +180,6 @@ typedef enum REFLOW_PROFILE
 #define PID_KD_REFLOW 350
 #define PID_SAMPLE_TIME 1000
 
-#if VERSION == 2
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
-#define X_AXIS_START 18 // X-axis starting position
-#endif
-
 // ***** LCD MESSAGES *****
 const char* lcdMessagesReflowStatus[] = {
   "Ready",
@@ -233,32 +193,18 @@ const char* lcdMessagesReflowStatus[] = {
 };
 
 // ***** DEGREE SYMBOL FOR LCD *****
-unsigned char degree[8]  = {
+unsigned char degree[8] = {
   140, 146, 146, 140, 128, 128, 128, 128
 };
 
 // ***** PIN ASSIGNMENT *****
-#if VERSION == 1
-unsigned char ssrPin = 3;
-unsigned char thermocoupleCSPin = 2;
-unsigned char lcdRsPin = 10;
-unsigned char lcdEPin = 9;
-unsigned char lcdD4Pin = 8;
-unsigned char lcdD5Pin = 7;
-unsigned char lcdD6Pin = 6;
-unsigned char lcdD7Pin = 5;
-unsigned char buzzerPin = 14;
-unsigned char switchPin = A1;
-unsigned char ledPin = LED_BUILTIN;
-#elif VERSION == 2
-unsigned char ssrPin = A0;
-unsigned char fanPin = A1;
-unsigned char thermocoupleCSPin = 10;
+unsigned char ssrPin = 2;
+unsigned char thermistorPin = A7;
 unsigned char ledPin = 4;
 unsigned char buzzerPin = 5;
 unsigned char switchStartStopPin = 3;
-unsigned char switchLfPbPin = 2;
-#endif
+unsigned char encA = 10;
+unsigned char encB = 11;
 
 // ***** PID CONTROL VARIABLES *****
 double setpoint;
@@ -267,6 +213,7 @@ double output;
 double kp = PID_KP_PREHEAT;
 double ki = PID_KI_PREHEAT;
 double kd = PID_KD_PREHEAT;
+
 int windowSize;
 unsigned long windowStartTime;
 unsigned long nextCheck;
@@ -293,127 +240,121 @@ switch_t switchValue;
 switch_t switchMask;
 // Seconds timer
 unsigned int timerSeconds;
-// Thermocouple fault status
+// Thermocouple fault status //TODO
 unsigned char fault;
-#ifdef VERSION == 2
 unsigned int timerUpdate;
 unsigned char temperature[SCREEN_WIDTH - X_AXIS_START];
 unsigned char x;
-#endif
+// Encoder
+signed char lastPos = 0;
+signed char posChange;
+unsigned int manualTemp;
 
-// PID control interface
+
+// Initialize PID Control Object
 PID reflowOvenPID(&input, &output, &setpoint, kp, ki, kd, DIRECT);
-#if VERSION == 1
-// LCD interface
-LiquidCrystal lcd(lcdRsPin, lcdEPin, lcdD4Pin, lcdD5Pin, lcdD6Pin, lcdD7Pin);
-#elif VERSION == 2
-Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
-#endif
-// MAX31856 thermocouple interface
-Adafruit_MAX31856 thermocouple = Adafruit_MAX31856(thermocoupleCSPin);
 
-void setup()
-{
-  // Check current selected reflow profile
-  unsigned char value = EEPROM.read(PROFILE_TYPE_ADDRESS);
-  if ((value == 0) || (value == 1))
-  {
-    // Valid reflow profile value
-    reflowProfile = value;
-  }
-  else
-  {
-    // Default to lead-free profile
-    EEPROM.write(PROFILE_TYPE_ADDRESS, 0);
-    reflowProfile = REFLOW_PROFILE_LEADFREE;
-  }
+// Initialize OLED Display Control Object
+Adafruit_SH1106G oled = Adafruit_SH1106G(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+// Initialize Thermistor Control Object
+//TODO THERMISTOR INIT
+
+// Create Encoder and LED control Objects
+EncoderStepCounter encoder(encA, encB);
+Adafruit_NeoPixel statusLed = Adafruit_NeoPixel(1, ledPin, NEO_RGB + NEO_KHZ800);
+
+
+void setup() {
+  // Initialize encoder & attach Interrupts
+  encoder.begin();
+  attachInterrupt(digitalPinToInterrupt(encA), interrupt, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(encB), interrupt, CHANGE);
+
+  //Hard-code default profile instead of storing last used
+  reflowProfile = REFLOW_PROFILE_LEADFREE;
 
   // SSR pin initialization to ensure reflow oven is off
   digitalWrite(ssrPin, LOW);
   pinMode(ssrPin, OUTPUT);
 
-  // Buzzer pin initialization to ensure annoying buzzer is off
-  digitalWrite(buzzerPin, LOW);
+  // Buzzer pin initialization
   pinMode(buzzerPin, OUTPUT);
+  noTone(buzzerPin);
 
-  // LED pins initialization and turn on upon start-up (active high)
-  pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, HIGH);
+  // Encoder Backlight LED initialization and turn on upon start-up
+  statusLed.begin();
+  statusLed.setPixelColor(0, statusLed.Color(255, 0, 0));
+  statusLed.show();
 
-  // Initialize thermocouple interface
-  thermocouple.begin();
-  thermocouple.setThermocoupleType(MAX31856_TCTYPE_K);
+  // Initialize thermistor interface
+  // TODO THERMISTOR
 
   // Start-up splash
-  digitalWrite(buzzerPin, HIGH);
-#if VERSION == 1
-  lcd.begin(8, 2);
-  lcd.createChar(0, degree);
-  lcd.clear();
-  lcd.print(F(" Tiny  "));
-  lcd.setCursor(0, 1);
-  lcd.print(F(" Reflow "));
-#elif VERSION == 2
-  oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  tone(buzzerPin, 2000);
+
+  oled.begin(0x3C, true);
   oled.display();
-#endif
-  digitalWrite(buzzerPin, LOW);
-  delay(2000);
-#if VERSION == 1
-  lcd.clear();
-  lcd.print(F(" v1.00  "));
-  lcd.setCursor(0, 1);
-  lcd.print(F("26-07-17"));
-  delay(2000);
-  lcd.clear();
-#elif VERSION == 2
+  noTone(buzzerPin);
+  delay(1000);
   oled.clearDisplay();
   oled.setTextSize(1);
-  oled.setTextColor(WHITE);
+  oled.setTextColor(SH110X_WHITE);
   oled.setCursor(0, 0);
-  oled.println(F("     Tiny Reflow"));
+  oled.println(F("      FlowIron"));
   oled.println(F("     Controller"));
   oled.println();
-  oled.println(F("       v2.00"));
+  oled.println(F("      v0.0.1"));
   oled.println();
-  oled.println(F("      04-03-19"));
+  oled.println(F("      07-09-23"));
   oled.display();
-  delay(3000);
+  delay(2000);
   oled.clearDisplay();
-#endif
 
   // Serial communication at 115200 bps
   Serial.begin(115200);
 
-  // Turn off LED (active high)
-  digitalWrite(ledPin, LOW);
+  // Turn off LED
+  statusLed.setPixelColor(0, statusLed.Color(0, 0, 0));
+  statusLed.show();
   // Set window size
   windowSize = 2000;
   // Initialize time keeping variable
   nextCheck = millis();
-  // Initialize thermocouple reading variable
+  // Initialize thermistor reading variable
   nextRead = millis();
   // Initialize LCD update timer
   updateLcd = millis();
 }
 
-void loop()
-{
+void loop() {
   // Current time
   unsigned long now;
 
-  // Time to read thermocouple?
-  if (millis() > nextRead)
-  {
-    // Read thermocouple next sampling period
+  // Detect Encoder Direction
+  signed char pos = encoder.getPosition();
+  posChange = 0;
+  if (pos < lastPos) {
+    posChange = -1;
+    lastPos = pos;
+  } else if (pos > lastPos) {
+    posChange = 1;
+    lastPos = pos;
+  }
+
+  // Time to read thermistor?
+  if (millis() > nextRead) {
+    // Read thermistor next sampling period
     nextRead += SENSOR_SAMPLING_TIME;
     // Read current temperature
-    input = thermocouple.readThermocoupleTemperature();
+    // TODO THERMISTOR
+    // input = thermocouple.readThermocoupleTemperature();
     // Check for thermocouple fault
-    fault = thermocouple.readFault();
+    // fault = thermocouple.readFault();
+    input = 24;
 
-    // If any thermocouple fault is detected
-    if ((fault & MAX31856_FAULT_CJRANGE) ||
+    //TODO THERMAL PROTECTION
+    /* if ((fault & MAX31856_FAULT_CJRANGE) ||
         (fault & MAX31856_FAULT_TCRANGE) ||
         (fault & MAX31856_FAULT_CJHIGH) ||
         (fault & MAX31856_FAULT_CJLOW) ||
@@ -421,23 +362,26 @@ void loop()
         (fault & MAX31856_FAULT_TCLOW) ||
         (fault & MAX31856_FAULT_OVUV) ||
         (fault & MAX31856_FAULT_OPEN))
-    {
+    { 
       // Illegal operation
       reflowState = REFLOW_STATE_ERROR;
       reflowStatus = REFLOW_STATUS_OFF;
       Serial.println(F("Error"));
-    }
+    } */
   }
 
-  if (millis() > nextCheck)
-  {
+  if (millis() > nextCheck) {
     // Check input in the next seconds
     nextCheck += SENSOR_SAMPLING_TIME;
     // If reflow process is on going
-    if (reflowStatus == REFLOW_STATUS_ON)
-    {
-      // Toggle red LED as system heart beat
-      digitalWrite(ledPin, !(digitalRead(ledPin)));
+    if (reflowStatus == REFLOW_STATUS_ON) {
+      // Toggle the NeoPixel color as a system heartbeat (alternate between red and off)
+      if (statusLed.getPixelColor(0) == statusLed.Color(255, 0, 0)) {
+        statusLed.setPixelColor(0, statusLed.Color(0, 0, 0));  // Turn off
+      } else {
+        statusLed.setPixelColor(0, statusLed.Color(255, 0, 0));  // Turn on with red color
+      }
+      statusLed.show();
       // Increase seconds timer for reflow curve plot
       timerSeconds++;
       // Send temperature and time stamp to serial
@@ -448,70 +392,33 @@ void loop()
       Serial.print(input);
       Serial.print(F(","));
       Serial.println(output);
-    }
-    else
-    {
-      // Turn off red LED
-      digitalWrite(ledPin, LOW);
+    } else {
+      // Turn off LED
+      statusLed.setPixelColor(0, statusLed.Color(0,0,0));
+      statusLed.show();
     }
   }
 
-  if (millis() > updateLcd)
-  {
+  if (millis() > updateLcd) {
     // Update LCD in the next 100 ms
     updateLcd += UPDATE_RATE;
-#if VERSION == 1
-    // Clear LCD
-    lcd.clear();
-    // Print current system state
-    lcd.print(lcdMessagesReflowStatus[reflowState]);
-    lcd.setCursor(6, 0);
-    if (reflowProfile == REFLOW_PROFILE_LEADFREE)
-    {
-	    lcd.print(F("LF"));
-    }
-    else
-    {
-      lcd.print(F("PB"));
-    }
-    lcd.setCursor(0, 1);
-    
-    // If currently in error state
-    if (reflowState == REFLOW_STATE_ERROR)
-    {
-      // Thermocouple error (open, shorted)
-      lcd.print(F("TC Error"));
-    }
-    else
-    {
-      // Display current temperature
-      lcd.print(input);
-#if ARDUINO >= 100
-      // Display degree Celsius symbol
-      lcd.write((uint8_t)0);
-#else
-      // Display degree Celsius symbol
-      lcd.print(0, BYTE);
-#endif
-      lcd.print("C ");
-    }
-#elif VERSION == 2
+
     oled.clearDisplay();
     oled.setTextSize(2);
     oled.setCursor(0, 0);
     oled.print(lcdMessagesReflowStatus[reflowState]);
     oled.setTextSize(1);
-    oled.setCursor(115, 0);
+    oled.setCursor(74, 0);  //Orig: 115
 
-    if (reflowProfile == REFLOW_PROFILE_LEADFREE)
+    if (reflowProfile == REFLOW_PROFILE_LEADFREE) {
+      oled.print(F("LF (245C)"));
+    } else if (reflowProfile == REFLOW_PROFILE_LEADED) {
+      oled.print(F("PB (219C)"));
+    } else  //REFLOW_PROFILE_MANUAL
     {
-      oled.print(F("LF"));
+      oled.print(F("MAN (XX)"));
     }
-    else
-    {
-      oled.print(F("PB"));
-    }
-    
+
     // Temperature markers
     oled.setCursor(0, 18);
     oled.print(F("250"));
@@ -520,104 +427,92 @@ void loop()
     oled.setCursor(0, 54);
     oled.print(F("50"));
     // Draw temperature and time axis
-    oled.drawLine(18, 18, 18, 63, WHITE);
-    oled.drawLine(18, 63, 127, 63, WHITE);
+    oled.drawLine(18, 18, 18, 63, SH110X_WHITE);
+    oled.drawLine(18, 63, 127, 63, SH110X_WHITE);
     oled.setCursor(115, 0);
 
     // If currently in error state
-    if (reflowState == REFLOW_STATE_ERROR)
-    {
+    if (reflowState == REFLOW_STATE_ERROR) {
       oled.setCursor(80, 9);
       oled.print(F("TC Error"));
-    }
-    else
-    {
+    } else {
       // Right align temperature reading
       if (input < 10) oled.setCursor(91, 9);
-      else if (input < 100) oled.setCursor(85,9);
+      else if (input < 100) oled.setCursor(85, 9);
       else oled.setCursor(80, 9);
       // Display current temperature
       oled.print(input);
       oled.print((char)247);
       oled.print(F("C"));
     }
-    
-    if (reflowStatus == REFLOW_STATUS_ON)
-    {
+
+    if (reflowStatus == REFLOW_STATUS_ON) {
       // We are updating the display faster than sensor reading
-      if (timerSeconds > timerUpdate)
-      {
+      if (timerSeconds > timerUpdate) {
         // Store temperature reading every 3 s
-        if ((timerSeconds % 3) == 0)
-        {
+        if ((timerSeconds % 3) == 0) {
           timerUpdate = timerSeconds;
           unsigned char averageReading = map(input, 0, 250, 63, 19);
-          if (x < (SCREEN_WIDTH - X_AXIS_START))
-          {
+          if (x < (SCREEN_WIDTH - X_AXIS_START)) {
             temperature[x++] = averageReading;
           }
         }
       }
     }
-    
+
     unsigned char timeAxis;
-    for (timeAxis = 0; timeAxis < x; timeAxis++)
-    {
-      oled.drawPixel(timeAxis + X_AXIS_START, temperature[timeAxis], WHITE);
+    for (timeAxis = 0; timeAxis < x; timeAxis++) {
+      oled.drawPixel(timeAxis + X_AXIS_START, temperature[timeAxis], SH110X_WHITE);
     }
-    
+
     // Update screen
     oled.display();
-#endif
   }
 
   // Reflow oven controller state machine
-  switch (reflowState)
-  {
+  switch (reflowState) {
     case REFLOW_STATE_IDLE:
       // If oven temperature is still above room temperature
-      if (input >= TEMPERATURE_ROOM)
-      {
+      if (input >= TEMPERATURE_ROOM) {
         reflowState = REFLOW_STATE_TOO_HOT;
-      }
-      else
-      {
+      } else {
         // If switch is pressed to start reflow process
-        if (switchStatus == SWITCH_1)
-        {
+        if (switchStatus == SWITCH_1) {
           // Send header for CSV file
           Serial.println(F("Time,Setpoint,Input,Output"));
           // Intialize seconds timer for serial debug information
           timerSeconds = 0;
-          
-          #if VERSION == 2
+
           // Initialize reflow plot update timer
           timerUpdate = 0;
-          
-          for (x = 0; x < (SCREEN_WIDTH - X_AXIS_START); x++)
-          {
+
+          for (x = 0; x < (SCREEN_WIDTH - X_AXIS_START); x++) {
             temperature[x] = 0;
           }
           // Initialize index for average temperature array used for reflow plot
           x = 0;
-          #endif
-          
+
           // Initialize PID control window starting time
           windowStartTime = millis();
           // Ramp up to minimum soaking temperature
           setpoint = TEMPERATURE_SOAK_MIN;
           // Load profile specific constant
-          if (reflowProfile == REFLOW_PROFILE_LEADFREE)
-          {
+          if (reflowProfile == REFLOW_PROFILE_LEADFREE) {
             soakTemperatureMax = TEMPERATURE_SOAK_MAX_LF;
             reflowTemperatureMax = TEMPERATURE_REFLOW_MAX_LF;
             soakMicroPeriod = SOAK_MICRO_PERIOD_LF;
           }
-          else
-          {
+
+          else if (reflowProfile == REFLOW_PROFILE_LEADED) {
             soakTemperatureMax = TEMPERATURE_SOAK_MAX_PB;
             reflowTemperatureMax = TEMPERATURE_REFLOW_MAX_PB;
             soakMicroPeriod = SOAK_MICRO_PERIOD_PB;
+          } else  //REFLOW_PROFILE_MANUAL
+          {
+            manualTemp = TEMPERATURE_REFLOW_MAN_START + 0;
+            soakTemperatureMax = manualTemp - TEMPERATURE_SOAK_MAN_OFFSET;  //TODO
+            reflowTemperatureMax = manualTemp;                              //TODO
+            soakMicroPeriod = SOAK_MICRO_PERIOD_MAN;
           }
           // Tell the PID to range between 0 and the full window size
           reflowOvenPID.SetOutputLimits(0, windowSize);
@@ -633,8 +528,7 @@ void loop()
     case REFLOW_STATE_PREHEAT:
       reflowStatus = REFLOW_STATUS_ON;
       // If minimum soak temperature is achieve
-      if (input >= TEMPERATURE_SOAK_MIN)
-      {
+      if (input >= TEMPERATURE_SOAK_MIN) {
         // Chop soaking period into smaller sub-period
         timerSoak = millis() + soakMicroPeriod;
         // Set less agressive PID parameters for soaking ramp
@@ -648,13 +542,11 @@ void loop()
 
     case REFLOW_STATE_SOAK:
       // If micro soak temperature is achieved
-      if (millis() > timerSoak)
-      {
+      if (millis() > timerSoak) {
         timerSoak = millis() + soakMicroPeriod;
         // Increment micro setpoint
         setpoint += SOAK_TEMPERATURE_STEP;
-        if (setpoint > soakTemperatureMax)
-        {
+        if (setpoint > soakTemperatureMax) {
           // Set agressive PID parameters for reflow ramp
           reflowOvenPID.SetTunings(PID_KP_REFLOW, PID_KI_REFLOW, PID_KD_REFLOW);
           // Ramp up to first section of soaking temperature
@@ -668,8 +560,7 @@ void loop()
     case REFLOW_STATE_REFLOW:
       // We need to avoid hovering at peak temperature for too long
       // Crude method that works like a charm and safe for the components
-      if (input >= (reflowTemperatureMax - 5))
-      {
+      if (input >= (reflowTemperatureMax - 5)) {
         // Set PID parameters for cooling ramp
         reflowOvenPID.SetTunings(PID_KP_REFLOW, PID_KI_REFLOW, PID_KD_REFLOW);
         // Ramp down to minimum cooling temperature
@@ -681,12 +572,11 @@ void loop()
 
     case REFLOW_STATE_COOL:
       // If minimum cool temperature is achieve
-      if (input <= TEMPERATURE_COOL_MIN)
-      {
+      if (input <= TEMPERATURE_COOL_MIN) {
         // Retrieve current time for buzzer usage
         buzzerPeriod = millis() + 1000;
         // Turn on buzzer to indicate completion
-        digitalWrite(buzzerPin, HIGH);
+        tone(buzzerPin, 2000);
         // Turn off reflow process
         reflowStatus = REFLOW_STATUS_OFF;
         // Proceed to reflow Completion state
@@ -695,10 +585,9 @@ void loop()
       break;
 
     case REFLOW_STATE_COMPLETE:
-      if (millis() > buzzerPeriod)
-      {
+      if (millis() > buzzerPeriod) {
         // Turn off buzzer
-        digitalWrite(buzzerPin, LOW);
+        noTone(buzzerPin);
         // Reflow process ended
         reflowState = REFLOW_STATE_IDLE;
       }
@@ -706,8 +595,7 @@ void loop()
 
     case REFLOW_STATE_TOO_HOT:
       // If oven temperature drops below room temperature
-      if (input < TEMPERATURE_ROOM)
-      {
+      if (input < TEMPERATURE_ROOM) {
         // Ready to reflow
         reflowState = REFLOW_STATE_IDLE;
       }
@@ -715,8 +603,8 @@ void loop()
 
     case REFLOW_STATE_ERROR:
       // Check for thermocouple fault
-      fault = thermocouple.readFault();
-
+      //TODO// fault = thermocouple.readFault();
+      /*
       // If thermocouple problem is still present
       if ((fault & MAX31856_FAULT_CJRANGE) ||
           (fault & MAX31856_FAULT_TCRANGE) ||
@@ -731,19 +619,17 @@ void loop()
         reflowState = REFLOW_STATE_ERROR;
       }
       else
-      {
-        // Clear to perform reflow process
-        reflowState = REFLOW_STATE_IDLE;
-      }
+      { */
+      // Clear to perform reflow process
+      reflowState = REFLOW_STATE_IDLE;
+      //TODO//}
       break;
   }
 
   // If switch 1 is pressed
-  if (switchStatus == SWITCH_1)
-  {
+  if (switchStatus == SWITCH_1) {
     // If currently reflow process is on going
-    if (reflowStatus == REFLOW_STATUS_ON)
-    {
+    if (reflowStatus == REFLOW_STATUS_ON) {
       // Button press is for cancelling
       // Turn off reflow process
       reflowStatus = REFLOW_STATUS_OFF;
@@ -751,44 +637,51 @@ void loop()
       reflowState = REFLOW_STATE_IDLE;
     }
   }
-  // Switch 2 is pressed
-  else if (switchStatus == SWITCH_2)
-  {
-    // Only can switch reflow profile during idle
-    if (reflowState == REFLOW_STATE_IDLE)
-    {
-      // Currently using lead-free reflow profile
-      if (reflowProfile == REFLOW_PROFILE_LEADFREE)
-      {
-        // Switch to leaded reflow profile
-        reflowProfile = REFLOW_PROFILE_LEADED;
-        EEPROM.write(PROFILE_TYPE_ADDRESS, 1);
+
+  if (reflowState == REFLOW_STATE_IDLE) {
+    if (posChange > 0) {  // Encoder rotated clockwise
+      // Increment the reflow profile
+      switch (reflowProfile) {
+        case REFLOW_PROFILE_LEADFREE:
+          reflowProfile = REFLOW_PROFILE_LEADED;
+          break;
+        case REFLOW_PROFILE_LEADED:
+          reflowProfile = REFLOW_PROFILE_MANUAL;
+          break;
+        case REFLOW_PROFILE_MANUAL:
+          reflowProfile = REFLOW_PROFILE_LEADFREE;
+          break;
       }
-      // Currently using leaded reflow profile
-      else
-      {
-        // Switch to lead-free profile
-        reflowProfile = REFLOW_PROFILE_LEADFREE;
-        EEPROM.write(PROFILE_TYPE_ADDRESS, 0);
+    } else if (posChange < 0) {  // Encoder rotated counter-clockwise
+      // Decrement the reflow profile
+      switch (reflowProfile) {
+        case REFLOW_PROFILE_LEADED:
+          reflowProfile = REFLOW_PROFILE_LEADFREE;
+          break;
+        case REFLOW_PROFILE_MANUAL:
+          reflowProfile = REFLOW_PROFILE_LEADED;
+          break;
+        case REFLOW_PROFILE_LEADFREE:
+          reflowProfile = REFLOW_PROFILE_MANUAL;
+          break;
       }
     }
   }
+
   // Switch status has been read
   switchStatus = SWITCH_NONE;
 
   // Simple switch debounce state machine (analog switch)
-  switch (debounceState)
-  {
+  switch (debounceState) {
     case DEBOUNCE_STATE_IDLE:
       // No valid switch press
       switchStatus = SWITCH_NONE;
 
       switchValue = readSwitch();
 
-      // If either switch is pressed
-      if (switchValue != SWITCH_NONE)
-      {
-        // Keep track of the pressed switch
+      // If a switch is pressed
+      if (switchValue != SWITCH_NONE) {
+        // Keep track of the pressed switch (not needed for one switch but possibly useful in the future)
         switchMask = switchValue;
         // Intialize debounce counter
         lastDebounceTime = millis();
@@ -799,11 +692,9 @@ void loop()
 
     case DEBOUNCE_STATE_CHECK:
       switchValue = readSwitch();
-      if (switchValue == switchMask)
-      {
+      if (switchValue == switchMask) {
         // If minimum debounce period is completed
-        if ((millis() - lastDebounceTime) > DEBOUNCE_PERIOD_MIN)
-        {
+        if ((millis() - lastDebounceTime) > DEBOUNCE_PERIOD_MIN) {
           // Valid switch press
           switchStatus = switchMask;
           // Proceed to wait for button release
@@ -811,8 +702,7 @@ void loop()
         }
       }
       // False trigger
-      else
-      {
+      else {
         // Reinitialize button debounce state machine
         debounceState = DEBOUNCE_STATE_IDLE;
       }
@@ -820,8 +710,7 @@ void loop()
 
     case DEBOUNCE_STATE_RELEASE:
       switchValue = readSwitch();
-      if (switchValue == SWITCH_NONE)
-      {
+      if (switchValue == SWITCH_NONE) {
         // Reinitialize button debounce state machine
         debounceState = DEBOUNCE_STATE_IDLE;
       }
@@ -829,14 +718,12 @@ void loop()
   }
 
   // PID computation and SSR control
-  if (reflowStatus == REFLOW_STATUS_ON)
-  {
+  if (reflowStatus == REFLOW_STATUS_ON) {
     now = millis();
 
     reflowOvenPID.Compute();
 
-    if ((now - windowStartTime) > windowSize)
-    {
+    if ((now - windowStartTime) > windowSize) {
       // Time to shift the Relay Window
       windowStartTime += windowSize;
     }
@@ -844,31 +731,22 @@ void loop()
     else digitalWrite(ssrPin, LOW);
   }
   // Reflow oven process is off, ensure oven is off
-  else
-  {
+  else {
     digitalWrite(ssrPin, LOW);
   }
 }
 
-switch_t readSwitch(void)
-{
+switch_t readSwitch(void) {
+
   int switchAdcValue = 0;
-#if VERSION == 1
-  // Analog multiplexing switch
-  switchAdcValue = analogRead(switchPin);
 
-  // Add some allowance (+10 ADC step) as ADC reading might be off a little
-  // due to 3V3 deviation and also resistor value tolerance
-  if (switchAdcValue >= 1000) return SWITCH_NONE;
-  if (switchAdcValue <= 10) return SWITCH_1;
-  if (switchAdcValue <= 522) return SWITCH_2;
-
-#elif VERSION == 2
   // Switch connected directly to individual separate pins
-  if (digitalRead(switchStartStopPin) == LOW) return SWITCH_1;
-  if (digitalRead(switchLfPbPin) == LOW) return SWITCH_2;
-
-#endif
+  if (digitalRead(switchStartStopPin) == HIGH) return SWITCH_1;
 
   return SWITCH_NONE;
+}
+
+// Call tick on every change interrupt
+void interrupt() {
+  encoder.tick();
 }
